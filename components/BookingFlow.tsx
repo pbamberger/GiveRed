@@ -221,6 +221,7 @@ function ConfirmedScreen({
 }) {
   const [shareCopied, setShareCopied] = useState(false)
   const groupName = group?.name ?? 'your group'
+  const newTotal = group ? group.totalDonations + 1 : null
 
   function share() {
     if (group) {
@@ -237,11 +238,30 @@ function ConfirmedScreen({
       <Typography variant="h4" sx={{ mb: 1 }}>
         See you {new Date(session.date).toLocaleDateString('en-NZ', { weekday: 'long' })}!
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         {session.time} · {session.venue}
         <br />
         {session.address}
       </Typography>
+
+      {/* Group impact panel */}
+      {group && newTotal && (
+        <Box
+          sx={{
+            mb: 3, p: 2.5, borderRadius: 3,
+            background: 'linear-gradient(135deg, #ffdad5 0%, #fff8f7 100%)',
+            border: '1px solid #f2b8b0',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="h3" component="p" sx={{ color: 'primary.main', fontWeight: 800, lineHeight: 1, mb: 0.5 }}>
+            {newTotal}
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'primary.dark', fontWeight: 600 }}>
+            {group.name} donations — you&apos;re #{newTotal}!
+          </Typography>
+        </Box>
+      )}
 
       {/* What to bring */}
       <Alert severity="info" icon={false} sx={{ textAlign: 'left', mb: 3, bgcolor: '#fff8f7' }}>
@@ -266,12 +286,25 @@ function ConfirmedScreen({
 
       {group && (
         <Button
-          variant="text"
+          variant="outlined"
+          color="primary"
           startIcon={<ShareIcon />}
           fullWidth
+          sx={{ mb: 2 }}
           onClick={share}
         >
           {shareCopied ? 'Link copied!' : 'Invite someone to the group'}
+        </Button>
+      )}
+
+      {group && (
+        <Button
+          href="/dashboard"
+          variant="text"
+          color="primary"
+          fullWidth
+        >
+          View your group dashboard →
         </Button>
       )}
     </Box>

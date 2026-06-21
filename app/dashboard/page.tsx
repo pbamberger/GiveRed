@@ -18,6 +18,11 @@ import ListItemText from '@mui/material/ListItemText'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import Snackbar from '@mui/material/Snackbar'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import TextField from '@mui/material/TextField'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
@@ -26,11 +31,14 @@ import LocationOnIcon from '@mui/icons-material/LocationOn'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import AddIcon from '@mui/icons-material/Add'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import PersonIcon from '@mui/icons-material/Person'
+import StarIcon from '@mui/icons-material/Star'
 import groupsData from '../../data/groups.json'
 import leaderboardData from '../../data/leaderboard.json'
 import type { Group } from '../../types'
 
-// Prototype: hardcoded to smith-whanau as the "logged in" champion's group
 const CHAMPION_SLUG = 'smith-whanau'
 const group = (groupsData as Group[]).find((g) => g.slug === CHAMPION_SLUG)!
 const leaderboard = (leaderboardData as Record<string, { rank: number; name: string; slug: string; quarterDonations: number }[]>)[group.city] ?? []
@@ -43,6 +51,43 @@ const BADGE_MILESTONES = [
   { count: 50,  name: 'Fifty and Counting' },
   { count: 100, name: 'Century Crew' },
 ]
+
+const ACTIVITY_FEED = [
+  { id: 1, icon: 'booking', text: 'Aroha booked a spot for 12 July', daysAgo: 0 },
+  { id: 2, icon: 'booking', text: 'James booked a spot for 12 July', daysAgo: 1 },
+  { id: 3, icon: 'milestone', text: 'Smith Whānau reached 47 donations', daysAgo: 3 },
+  { id: 4, icon: 'joined', text: 'Hemi joined the group', daysAgo: 5 },
+  { id: 5, icon: 'session', text: 'New session added: 12 July at Auckland City Donor Centre', daysAgo: 6 },
+  { id: 6, icon: 'donation', text: 'Wiremu donated — group total now 47', daysAgo: 12 },
+  { id: 7, icon: 'reminder', text: 'Session reminder sent to 4 members', daysAgo: 15 },
+  { id: 8, icon: 'donation', text: 'Aroha donated — group total now 46', daysAgo: 20 },
+  { id: 9, icon: 'badge', text: 'Badge earned: Quarter Century (25 donations)', daysAgo: 28 },
+  { id: 10, icon: 'joined', text: 'Maria joined the group', daysAgo: 35 },
+  { id: 11, icon: 'donation', text: 'James donated — group total now 45', daysAgo: 42 },
+]
+
+function relativeDay(daysAgo: number): string {
+  if (daysAgo === 0) return 'Today'
+  if (daysAgo === 1) return 'Yesterday'
+  if (daysAgo < 7) return `${daysAgo} days ago`
+  if (daysAgo < 14) return '1 week ago'
+  if (daysAgo < 21) return '2 weeks ago'
+  if (daysAgo < 28) return '3 weeks ago'
+  return `${Math.round(daysAgo / 30)} month${Math.round(daysAgo / 30) > 1 ? 's' : ''} ago`
+}
+
+function activityIcon(type: string) {
+  switch (type) {
+    case 'booking':  return <CalendarMonthIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+    case 'donation': return <FavoriteIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+    case 'milestone': return <EmojiEventsIcon sx={{ fontSize: 18, color: '#705c2e' }} />
+    case 'joined':   return <PersonIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+    case 'session':  return <CalendarMonthIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+    case 'reminder': return <NotificationsIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+    case 'badge':    return <StarIcon sx={{ fontSize: 18, color: '#705c2e' }} />
+    default:         return <FavoriteIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+  }
+}
 
 function nextMilestone(total: number) {
   return BADGE_MILESTONES.find((m) => m.count > total)
@@ -84,7 +129,6 @@ function MembersTab() {
 
   return (
     <Box sx={{ position: 'relative', pb: 10 }}>
-      {/* Session banner */}
       {group.nextSession && (
         <Alert
           severity="info"
@@ -100,10 +144,7 @@ function MembersTab() {
         </Alert>
       )}
 
-      {/* Member list */}
-      <Typography variant="h6" sx={{ mb: 1 }}>
-        All members ({group.memberCount})
-      </Typography>
+      <Typography variant="h6" sx={{ mb: 1 }}>All members ({group.memberCount})</Typography>
       <List disablePadding>
         {group.members.map((member) => {
           const hasReminded = reminded.has(member.firstName)
@@ -111,10 +152,7 @@ function MembersTab() {
             <ListItem
               key={member.firstName}
               disableGutters
-              sx={{
-                py: 1, borderBottom: '1px solid', borderColor: 'divider',
-                '&:last-child': { borderBottom: 'none' },
-              }}
+              sx={{ py: 1, borderBottom: '1px solid', borderColor: 'divider', '&:last-child': { borderBottom: 'none' } }}
               secondaryAction={
                 !member.booked && (
                   <Button
@@ -152,7 +190,6 @@ function MembersTab() {
         })}
       </List>
 
-      {/* Invite FAB */}
       <Fab
         color="primary"
         variant="extended"
@@ -164,87 +201,175 @@ function MembersTab() {
         {inviteCopied ? 'Link copied!' : 'Invite someone'}
       </Fab>
 
-      <Snackbar
-        open={snackOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackOpen(false)}
-        message={snackMsg}
-      />
+      <Snackbar open={snackOpen} autoHideDuration={3000} onClose={() => setSnackOpen(false)} message={snackMsg} />
     </Box>
   )
 }
 
 // ── Sessions tab ───────────────────────────────────────────────────────────
 
+type AddedSession = {
+  id: string
+  date: string
+  time: string
+  endTime: string
+  venue: string
+  spotsTotal: number
+  spotsTaken: number
+}
+
 function SessionsTab() {
   const booked = group.members.filter((m) => m.booked).length
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [added, setAdded] = useState<AddedSession[]>([])
+  const [form, setForm] = useState({ date: '', time: '10:00', endTime: '12:00', venue: '', spots: '10' })
+  const [snackOpen, setSnackOpen] = useState(false)
 
-  if (!group.nextSession) {
-    return (
-      <Box sx={{ textAlign: 'center', py: 6 }}>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          No upcoming sessions scheduled yet.
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Sessions are added by the group champion. Check back soon.
-        </Typography>
-      </Box>
-    )
+  function handleAdd() {
+    if (!form.date || !form.venue) return
+    setAdded((prev) => [{
+      id: `added-${Date.now()}`,
+      date: form.date,
+      time: form.time,
+      endTime: form.endTime,
+      venue: form.venue,
+      spotsTotal: parseInt(form.spots) || 10,
+      spotsTaken: 0,
+    }, ...prev])
+    setDialogOpen(false)
+    setSnackOpen(true)
+    setForm({ date: '', time: '10:00', endTime: '12:00', venue: '', spots: '10' })
   }
 
   const s = group.nextSession
-  const spotsLeft = s.spotsTotal - s.spotsTaken
-  const fillPct = (s.spotsTaken / s.spotsTotal) * 100
+  const spotsLeft = s ? s.spotsTotal - s.spotsTaken : 0
+  const fillPct = s ? (s.spotsTaken / s.spotsTotal) * 100 : 0
   const memberBookPct = Math.round((booked / group.memberCount) * 100)
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ mb: 2 }}>Upcoming sessions</Typography>
-      <Card elevation={1}>
-        <CardContent>
-          <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
-            <CalendarMonthIcon sx={{ color: 'primary.main', mt: 0.25, flexShrink: 0 }} aria-hidden="true" />
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                {formatDate(s.date)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {s.time}–{s.endTime}
-              </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h6">Upcoming sessions</Typography>
+        <Button size="small" variant="outlined" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
+          Add session
+        </Button>
+      </Box>
+
+      {/* Newly added sessions */}
+      {added.map((ns) => (
+        <Card key={ns.id} elevation={1} sx={{ mb: 2, border: '1px solid', borderColor: 'primary.light' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', gap: 1.5, mb: 1 }}>
+              <CalendarMonthIcon sx={{ color: 'primary.main', mt: 0.25, flexShrink: 0 }} aria-hidden="true" />
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>{formatDate(ns.date)}</Typography>
+                <Typography variant="body2" color="text.secondary">{ns.time}–{ns.endTime}</Typography>
+              </Box>
             </Box>
-          </Box>
+            <Box sx={{ display: 'flex', gap: 1.5 }}>
+              <LocationOnIcon sx={{ color: 'text.secondary', mt: 0.25, flexShrink: 0, fontSize: 20 }} aria-hidden="true" />
+              <Typography variant="body2" color="text.secondary">{ns.venue}</Typography>
+            </Box>
+            <Chip label="Just added" size="small" sx={{ mt: 1.5, bgcolor: '#ffdad5', color: 'primary.dark' }} />
+          </CardContent>
+        </Card>
+      ))}
 
-          <Box sx={{ display: 'flex', gap: 1.5, mb: 3 }}>
-            <LocationOnIcon sx={{ color: 'text.secondary', mt: 0.25, flexShrink: 0, fontSize: 20 }} aria-hidden="true" />
-            <Typography variant="body2" color="text.secondary">{s.venue}</Typography>
-          </Box>
+      {/* Existing next session */}
+      {s ? (
+        <Card elevation={1}>
+          <CardContent>
+            <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
+              <CalendarMonthIcon sx={{ color: 'primary.main', mt: 0.25, flexShrink: 0 }} aria-hidden="true" />
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>{formatDate(s.date)}</Typography>
+                <Typography variant="body2" color="text.secondary">{s.time}–{s.endTime}</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1.5, mb: 3 }}>
+              <LocationOnIcon sx={{ color: 'text.secondary', mt: 0.25, flexShrink: 0, fontSize: 20 }} aria-hidden="true" />
+              <Typography variant="body2" color="text.secondary">{s.venue}</Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Available spots: {spotsLeft} of {s.spotsTotal} remaining
+            </Typography>
+            <LinearProgress variant="determinate" value={fillPct}
+              aria-label={`${s.spotsTaken} of ${s.spotsTotal} spots taken`}
+              sx={{ height: 6, borderRadius: 4, mb: 3 }} />
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Your group: {booked} of {group.memberCount} members booked ({memberBookPct}%)
+            </Typography>
+            <LinearProgress variant="determinate" value={memberBookPct} color="success"
+              aria-label={`${booked} of ${group.memberCount} group members booked`}
+              sx={{ height: 6, borderRadius: 4, mb: 2 }} />
+            <Button href={`/book?group=${group.slug}`} variant="contained" color="primary" fullWidth>
+              Book a spot
+            </Button>
+          </CardContent>
+        </Card>
+      ) : added.length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 6 }}>
+          <Typography variant="body1" color="text.secondary">No upcoming sessions. Add one above.</Typography>
+        </Box>
+      )}
 
-          {/* Spot availability */}
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-            Available spots: {spotsLeft} of {s.spotsTotal} remaining
-          </Typography>
-          <LinearProgress variant="determinate" value={fillPct}
-            aria-label={`${s.spotsTaken} of ${s.spotsTotal} spots taken`}
-            sx={{ height: 6, borderRadius: 4, mb: 3 }} />
-
-          {/* Group booking progress */}
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-            Your group: {booked} of {group.memberCount} members booked ({memberBookPct}%)
-          </Typography>
-          <LinearProgress variant="determinate" value={memberBookPct} color="success"
-            aria-label={`${booked} of ${group.memberCount} group members booked`}
-            sx={{ height: 6, borderRadius: 4, mb: 2 }} />
-
-          <Button
-            href={`/book?group=${group.slug}`}
-            variant="contained"
-            color="primary"
+      {/* Add session dialog */}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Add a session</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+          <TextField
+            label="Date"
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+            slotProps={{ inputLabel: { shrink: true } }}
             fullWidth
-          >
-            Book a spot
+            required
+          />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label="Start time"
+              type="time"
+              value={form.time}
+              onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))}
+              slotProps={{ inputLabel: { shrink: true } }}
+              fullWidth
+            />
+            <TextField
+              label="End time"
+              type="time"
+              value={form.endTime}
+              onChange={(e) => setForm((f) => ({ ...f, endTime: e.target.value }))}
+              slotProps={{ inputLabel: { shrink: true } }}
+              fullWidth
+            />
+          </Box>
+          <TextField
+            label="Venue"
+            value={form.venue}
+            onChange={(e) => setForm((f) => ({ ...f, venue: e.target.value }))}
+            placeholder="e.g. Auckland City Donor Centre"
+            fullWidth
+            required
+          />
+          <TextField
+            label="Total spots"
+            type="number"
+            value={form.spots}
+            onChange={(e) => setForm((f) => ({ ...f, spots: e.target.value }))}
+            fullWidth
+            slotProps={{ htmlInput: { min: 1, max: 50 } }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleAdd} disabled={!form.date || !form.venue}>
+            Add session
           </Button>
-        </CardContent>
-      </Card>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar open={snackOpen} autoHideDuration={3000} onClose={() => setSnackOpen(false)} message="Session added" />
     </Box>
   )
 }
@@ -260,7 +385,6 @@ function BadgesTab() {
 
   return (
     <Box>
-      {/* Big number */}
       <Box sx={{ textAlign: 'center', mb: 4, py: 3, borderRadius: 3, bgcolor: '#fff8f7' }}>
         <Typography variant="h1" component="p" sx={{ color: 'primary.main', fontWeight: 700, lineHeight: 1, mb: 0.5 }}>
           {group.totalDonations}
@@ -275,7 +399,6 @@ function BadgesTab() {
         )}
       </Box>
 
-      {/* Yearly goal progress */}
       <Typography variant="h6" sx={{ mb: 1 }}>Yearly goal</Typography>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
         <Typography variant="body2" color="text.secondary">
@@ -287,15 +410,10 @@ function BadgesTab() {
         aria-label={`${goalProgress}% of yearly goal`}
         sx={{ height: 8, borderRadius: 4, mb: 4 }} />
 
-      {/* Leaderboard */}
       {leaderboard.length > 0 && (
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" sx={{ mb: 0.5 }}>
-            {group.city} leaderboard
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Q2 2026 · donations this quarter
-          </Typography>
+          <Typography variant="h6" sx={{ mb: 0.5 }}>{group.city} leaderboard</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Q2 2026 · donations this quarter</Typography>
           <List disablePadding>
             {leaderboard.map((entry) => {
               const isMe = entry.slug === group.slug
@@ -316,11 +434,7 @@ function BadgesTab() {
                     </Typography>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={
-                      <Typography variant="body1" sx={{ fontWeight: isMe ? 700 : 400 }}>
-                        {entry.name}{isMe ? ' ★' : ''}
-                      </Typography>
-                    }
+                    primary={<Typography variant="body1" sx={{ fontWeight: isMe ? 700 : 400 }}>{entry.name}{isMe ? ' ★' : ''}</Typography>}
                     secondary={`${entry.quarterDonations} donations`}
                   />
                 </ListItem>
@@ -335,7 +449,6 @@ function BadgesTab() {
         </Box>
       )}
 
-      {/* Earned badges */}
       <Typography variant="h6" sx={{ mb: 2 }}>Badges earned</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
         {group.badges.map((badge) => (
@@ -358,14 +471,59 @@ function BadgesTab() {
   )
 }
 
+// ── Activity tab ───────────────────────────────────────────────────────────
+
+function ActivityTab() {
+  return (
+    <Box>
+      <Typography variant="h6" sx={{ mb: 2 }}>Recent activity</Typography>
+      <List disablePadding>
+        {ACTIVITY_FEED.map((item, i) => (
+          <ListItem
+            key={item.id}
+            disableGutters
+            alignItems="flex-start"
+            sx={{
+              py: 1.25,
+              borderBottom: i < ACTIVITY_FEED.length - 1 ? '1px solid' : 'none',
+              borderColor: 'divider',
+            }}
+          >
+            <ListItemAvatar sx={{ minWidth: 40, mt: 0.25 }}>
+              <Box
+                sx={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  bgcolor: item.icon === 'milestone' || item.icon === 'badge' ? '#fcdfa6' : '#ffdad5',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+                aria-hidden="true"
+              >
+                {activityIcon(item.icon)}
+              </Box>
+            </ListItemAvatar>
+            <ListItemText
+              primary={<Typography variant="body2">{item.text}</Typography>}
+              secondary={
+                <Typography variant="caption" color="text.disabled">
+                  {relativeDay(item.daysAgo)}
+                </Typography>
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  )
+}
+
 // ── Dashboard page ─────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const [tab, setTab] = useState(0)
+  const TAB_NAMES = ['members', 'sessions', 'badges', 'activity']
 
   return (
     <Container maxWidth="sm" sx={{ py: { xs: 3, sm: 5 }, px: { xs: 2, sm: 3 } }}>
-      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
         <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48, fontWeight: 700 }} aria-hidden="true">
           {group.name[0]}
@@ -380,28 +538,30 @@ export default function DashboardPage() {
         </Box>
       </Box>
 
-      {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
           aria-label="Dashboard sections"
-          variant="fullWidth"
+          variant="scrollable"
+          scrollButtons="auto"
         >
           <Tab label="Members" id="tab-members" aria-controls="panel-members" />
           <Tab label="Sessions" id="tab-sessions" aria-controls="panel-sessions" />
           <Tab label="Badges" id="tab-badges" aria-controls="panel-badges" />
+          <Tab label="Activity" id="tab-activity" aria-controls="panel-activity" />
         </Tabs>
       </Box>
 
       <Box
         role="tabpanel"
-        id={`panel-${['members', 'sessions', 'badges'][tab]}`}
-        aria-labelledby={`tab-${['members', 'sessions', 'badges'][tab]}`}
+        id={`panel-${TAB_NAMES[tab]}`}
+        aria-labelledby={`tab-${TAB_NAMES[tab]}`}
       >
         {tab === 0 && <MembersTab />}
         {tab === 1 && <SessionsTab />}
         {tab === 2 && <BadgesTab />}
+        {tab === 3 && <ActivityTab />}
       </Box>
     </Container>
   )
