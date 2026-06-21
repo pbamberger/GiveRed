@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 40">
+  <!-- Blood drop: circle top (centre 16,15 r=13), pointed tail at bottom -->
+  <path d="M16,38 C10,29 3,23 3,15 A13,13 0 0,1 29,15 C29,23 22,29 16,38 Z" fill="#b02d21"/>
+  <!-- White heart: two arcs (r=5) meeting at centre top, bezier tail -->
+  <path d="M16,25 C11,20 6,17 6,14 A5,5 0 0,1 16,14 A5,5 0 0,1 26,14 C26,17 21,20 16,25 Z" fill="white"/>
+</svg>

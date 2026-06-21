@@ -1,0 +1,62 @@
+[
+  {
+    "id": "akl-cbd-jul12-am",
+    "venue": "Auckland City Donor Centre",
+    "address": "71 Great South Rd, Auckland CBD",
+    "suburb": "Auckland CBD",
+    "city": "Auckland",
+    "date": "2026-07-12",
+    "time": "10:00",
+    "endTime": "12:00",
+    "spotsTotal": 10,
+    "spotsTaken": 6
+  },
+  {
+    "id": "akl-newmarket-jul15",
+    "venue": "Newmarket Donor Centre",
+    "address": "12 Khyber Pass Rd, Newmarket",
+    "suburb": "Newmarket",
+    "city": "Auckland",
+    "date": "2026-07-15",
+    "time": "12:00",
+    "endTime": "14:00",
+    "spotsTotal": 15,
+    "spotsTaken": 11
+  },
+  {
+    "id": "akl-cbd-jul20-am",
+    "venue": "Auckland City Donor Centre",
+    "address": "71 Great South Rd, Auckland CBD",
+    "suburb": "Auckland CBD",
+    "city": "Auckland",
+    "date": "2026-07-20",
+    "time": "09:00",
+    "endTime": "11:00",
+    "spotsTotal": 10,
+    "spotsTaken": 4
+  },
+  {
+    "id": "wgtn-central-jul10",
+    "venue": "Wellington Central Donor Centre",
+    "address": "34 Manners St, Wellington CBD",
+    "suburb": "Wellington CBD",
+    "city": "Wellington",
+    "date": "2026-07-10",
+    "time": "11:00",
+    "endTime": "13:00",
+    "spotsTotal": 12,
+    "spotsTaken": 9
+  },
+  {
+    "id": "chch-central-jul18",
+    "venue": "Christchurch Donor Centre",
+    "address": "889 Colombo St, Christchurch Central",
+    "suburb": "Christchurch Central",
+    "city": "Christchurch",
+    "date": "2026-07-18",
+    "time": "07:30",
+    "endTime": "09:00",
+    "spotsTotal": 12,
+    "spotsTaken": 8
+  }
+]

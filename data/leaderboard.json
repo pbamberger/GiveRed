@@ -1,0 +1,14 @@
+{
+  "Auckland": [
+    { "rank": 1, "name": "Fletcher Building Crew",    "slug": "fletcher-building",   "quarterDonations": 28 },
+    { "rank": 2, "name": "Auckland FC Supporters",    "slug": "auckland-fc",          "quarterDonations": 19 },
+    { "rank": 3, "name": "Woolworths Sylvia Park",    "slug": "countdown-sylvia-park","quarterDonations": 16 },
+    { "rank": 4, "name": "The Smith Whānau",          "slug": "smith-whanau",         "quarterDonations": 8  }
+  ],
+  "Wellington": [
+    { "rank": 1, "name": "Te Kōhanga Reo o Pōneke",  "slug": "kohanga-reo-ponsonby", "quarterDonations": 31 }
+  ],
+  "Christchurch": [
+    { "rank": 1, "name": "Te Whatu Ora Nurses",       "slug": "christchurch-nurses",  "quarterDonations": 22 }
+  ]
+}
