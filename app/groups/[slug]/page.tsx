@@ -9,7 +9,6 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
-import Link from 'next/link'
 import GroupsIcon from '@mui/icons-material/Groups'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
@@ -166,7 +165,6 @@ export default async function GroupProfilePage({
                   sx={{ height: 6, borderRadius: 4, mb: 2 }}
                 />
                 <Button
-                  component={Link}
                   href={`/book?group=${group.slug}`}
                   variant="contained"
                   color="primary"
