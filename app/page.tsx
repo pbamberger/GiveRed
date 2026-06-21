@@ -15,6 +15,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import HomeIcon from '@mui/icons-material/Home'
 import BusinessIcon from '@mui/icons-material/Business'
 import PeopleIcon from '@mui/icons-material/People'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import Link from 'next/link'
 
 const HOW_IT_WORKS = [
@@ -162,6 +163,26 @@ export default function HomePage() {
                 Start a group
               </Button>
             </Stack>
+
+            {/* Demo path */}
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.75,
+                px: 1.5,
+                py: 0.75,
+                borderRadius: 2,
+                border: '1px dashed',
+                borderColor: 'primary.main',
+                backgroundColor: 'rgba(176,45,33,0.05)',
+              }}
+            >
+              <PlayArrowIcon sx={{ fontSize: 14, color: 'primary.main' }} aria-hidden="true" />
+              <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 500 }}>
+                Demo path: Find a group → Group profile → Book a session → Dashboard
+              </Typography>
+            </Box>
           </Stack>
         </Container>
       </Box>

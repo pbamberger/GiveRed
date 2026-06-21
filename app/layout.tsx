@@ -3,6 +3,7 @@ import './globals.css'
 import ThemeRegistry from './ThemeRegistry'
 import NavBar from '../components/NavBar'
 import Footer from '../components/Footer'
+import DemoBanner from '../components/DemoBanner'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://givered.nz'),
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Skip to main content
           </a>
           <NavBar />
+          <DemoBanner />
           <main id="main-content" style={{ flex: 1 }}>
             {children}
           </main>
