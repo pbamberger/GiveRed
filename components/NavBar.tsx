@@ -20,6 +20,7 @@ import { usePathname } from 'next/navigation'
 
 const NAV_LINKS = [
   { href: '/groups',    label: 'Find a group', demo: false },
+  { href: '/my-group',  label: 'My group',     demo: true  },
   { href: '/dashboard', label: 'Dashboard',    demo: true  },
 ]
 

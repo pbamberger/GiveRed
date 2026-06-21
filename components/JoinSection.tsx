@@ -55,18 +55,22 @@ export default function JoinSection({ group }: { group: Group }) {
       >
         <CheckCircleIcon sx={{ fontSize: 48, color: 'success.main', mb: 1 }} aria-hidden="true" />
         <Typography variant="h5" sx={{ mb: 1 }}>You&apos;re in!</Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+          Welcome to <strong>{group.name}</strong>.
+        </Typography>
         {group.nextSession && (
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Next session: <strong>{group.nextSession.venue}</strong><br />
-            {new Date(group.nextSession.date).toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long' })}{' '}
-            at {group.nextSession.time}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Next session: {new Date(group.nextSession.date).toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long' })} at {group.nextSession.time}
           </Typography>
         )}
-        <Button href={`/book?group=${group.slug}`} variant="contained" color="primary" size="large" fullWidth sx={{ mb: 2 }}>
+        <Button href="/my-group" variant="contained" color="primary" size="large" fullWidth sx={{ mb: 1.5 }}>
+          View my group
+        </Button>
+        <Button href={`/book?group=${group.slug}`} variant="outlined" color="primary" fullWidth sx={{ mb: 1.5 }}>
           Book my spot
         </Button>
-        <Button onClick={copyLink} variant="outlined" startIcon={<ContentCopyIcon />} fullWidth>
-          {copied ? 'Copied!' : 'Share this group'}
+        <Button onClick={copyLink} variant="text" color="primary" startIcon={<ContentCopyIcon />} fullWidth>
+          {copied ? 'Copied!' : 'Invite someone'}
         </Button>
       </Box>
     )

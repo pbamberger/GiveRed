@@ -242,6 +242,13 @@ function Step2({
 
 // ── Step 3 — Done ──────────────────────────────────────────────────────────
 
+const NEXT_STEPS = [
+  { id: 'created',  label: 'Group created',          done: true,  action: null },
+  { id: 'session',  label: 'Add your first session',  done: false, action: { label: 'Go to Sessions', href: '/dashboard' } },
+  { id: 'invite',   label: 'Invite your first members', done: false, action: null },
+  { id: 'book',     label: 'Book your own spot',      done: false, action: { label: 'Browse sessions', href: '/book?group=smith-whanau' } },
+]
+
 function Step3({ groupName, slug }: { groupName: string; slug: string }) {
   const [copied, setCopied] = useState(false)
   const inviteUrl = `https://givered.nz/join/${slug}`
@@ -254,51 +261,102 @@ function Step3({ groupName, slug }: { groupName: string; slug: string }) {
   }
 
   return (
-    <Box sx={{ textAlign: 'center' }} role="status" aria-live="polite">
-      <CheckCircleIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} aria-hidden="true" />
-
-      <Typography variant="h4" sx={{ mb: 1 }}>
-        Your group is live!
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Share the link below to invite people to <strong>{groupName}</strong>.
-      </Typography>
-
-      <Box
-        sx={{
-          p: 2, mb: 3,
-          borderRadius: 2,
-          backgroundColor: '#f5ddda',
-          fontFamily: 'monospace',
-          wordBreak: 'break-all',
-          fontSize: '0.875rem',
-        }}
-        aria-label="Your group invite link"
-      >
-        {inviteUrl}
+    <Box role="status" aria-live="polite">
+      {/* Celebration */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <CheckCircleIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} aria-hidden="true" />
+        <Typography variant="h4" sx={{ mb: 1 }}>
+          {groupName} is live!
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Your group is ready. Here&apos;s what to do next.
+        </Typography>
       </Box>
 
-      <Button
-        onClick={copyLink}
-        variant="contained"
-        color="primary"
-        size="large"
-        startIcon={<ContentCopyIcon />}
-        fullWidth
-        sx={{ mb: 2 }}
-      >
-        {copied ? 'Copied to clipboard!' : 'Copy invite link'}
-      </Button>
+      {/* Next steps checklist */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>Your checklist</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          {NEXT_STEPS.map(({ id, label, done, action }) => {
+            const isInvite = id === 'invite'
+            const isDone = isInvite ? copied : done
+            return (
+              <Box
+                key={id}
+                sx={{
+                  display: 'flex', alignItems: 'center', gap: 2,
+                  p: 1.5, borderRadius: 2,
+                  bgcolor: isDone ? '#f6fbf6' : 'background.paper',
+                  border: '1px solid',
+                  borderColor: isDone ? 'success.light' : 'divider',
+                }}
+              >
+                <CheckCircleIcon
+                  sx={{ fontSize: 22, color: isDone ? 'success.main' : 'text.disabled', flexShrink: 0 }}
+                  aria-hidden="true"
+                />
+                <Typography
+                  variant="body2"
+                  sx={{ flex: 1, fontWeight: isDone ? 400 : 500, color: isDone ? 'text.secondary' : 'text.primary', textDecoration: isDone ? 'line-through' : 'none' }}
+                >
+                  {label}
+                </Typography>
+                {isInvite && !isDone && (
+                  <Button size="small" variant="outlined" startIcon={<ContentCopyIcon sx={{ fontSize: 14 }} />} onClick={copyLink} sx={{ flexShrink: 0, fontSize: '0.75rem' }}>
+                    Copy link
+                  </Button>
+                )}
+                {action && !isDone && (
+                  <Button size="small" variant="outlined" href={action.href} sx={{ flexShrink: 0, fontSize: '0.75rem' }}>
+                    {action.label}
+                  </Button>
+                )}
+              </Box>
+            )
+          })}
+        </Box>
+      </Box>
 
-      {copied && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          Link copied — paste it into WhatsApp, email, or Slack.
-        </Alert>
-      )}
+      {/* Invite link */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>Invite link</Typography>
+        <Box
+          sx={{
+            p: 2, borderRadius: 2,
+            backgroundColor: '#f5ddda',
+            fontFamily: 'monospace',
+            wordBreak: 'break-all',
+            fontSize: '0.875rem',
+          }}
+          aria-label="Your group invite link"
+        >
+          {inviteUrl}
+        </Box>
+        {copied && (
+          <Alert severity="success" sx={{ mt: 1 }}>
+            Copied — paste it into WhatsApp, email, or Slack.
+          </Alert>
+        )}
+      </Box>
 
-      <Button href="/dashboard" variant="outlined" fullWidth>
-        Go to my dashboard
-      </Button>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+        <Button
+          onClick={copyLink}
+          variant="contained"
+          color="primary"
+          size="large"
+          startIcon={<ContentCopyIcon />}
+          fullWidth
+        >
+          {copied ? 'Link copied!' : 'Copy invite link'}
+        </Button>
+        <Button href="/dashboard" variant="outlined" color="primary" fullWidth>
+          Go to my dashboard
+        </Button>
+        <Button href="/groups/smith-whanau" variant="text" color="primary" fullWidth>
+          Preview a group profile →
+        </Button>
+      </Box>
     </Box>
   )
 }
